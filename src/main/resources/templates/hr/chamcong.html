@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách chấm công</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .container.right-aligned {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+        }
+        .container.right-aligned .form-control,
+        .container.right-aligned .btn {
+            margin-bottom: 0;
+        }
+        /* Style for the separator */
+        .container.right-aligned .separator {
+            border-right: 1px solid #ccc;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .table-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 20px;
+    overflow: auto;
+}
+    </style>
+</head>
+<body>
+<div class="container" >
+    <section layout:fragment="content">
+        <div class="container right-aligned">
+            <form th:action="@{/chamcong/list}" method="get" id="monthForm" class="mb-3">
+                <label for="datepicker" class="form-label"></label>
+                <input type="month" class="form-control" id="datepicker" name="selectedMonth"
+                       onchange="document.getElementById('monthForm').submit()">
+            </form>
+            <div class="separator"></div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="bi bi-folder-plus"></i> Chấm Công
+            </button>
+        </div>
+
+        <!-- Modal for file upload -->
+        <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadModalLabel" style="text-align: center;">Upload File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/chamcong/upload}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="attendanceFile" class="form-label"></label>
+                                <input type="file" class="form-control" id="attendanceFile" name="file" accept=".xlsx, .xls">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table to display attendance records -->
+        <div class="table-wrapper">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>IDNV</th>
+                    <th>Nhân viên</th>
+                    <th>Số ngày làm</th>
+                    <th>Số ngày nghỉ</th>
+                    <th>Số lần trễ</th>
+                    <th>Thời Gian</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over the list of ChamCong objects -->
+                <tr th:each="chamCong : ${listChamCong}">
+                    <td th:text="${chamCong.id.idNV}">Số ngày làm</td>
+                    <td th:text="${chamCong.nhanVien != null ? chamCong.nhanVien.hoDem + ' ' + chamCong.nhanVien.ten : 'Unknown'}">Họ Tên</td>
+                    <td th:text="${chamCong.soNgayLam}">Số ngày làm</td>
+                    <td th:text="${chamCong.soNgayNghi}">Số ngày nghỉ</td>
+                    <td th:text="${chamCong.soLanTre}">Số lần trễ</td>
+                    <td th:text="${#dates.format(chamCong.thangNam, 'MM/yyyy')}">Tháng/Năm</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var selectMonth = document.getElementById('selectedMonth');
+        var defaultMonth = new Date().getMonth() + 1; // Lấy tháng hiện tại (từ 0 đến 11 nên cộng thêm 1)
+        // Tạo options cho select
+        for (var i = 1; i <= 12; i++) {
+            var option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            if (i === defaultMonth) {
+                option.selected = true; // Chọn mặc định tháng hiện tại
+            }
+            selectMonth.appendChild(option);
+        }
+    });
+</script>
+</body>
+</html>
