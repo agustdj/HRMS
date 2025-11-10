@@ -1,2 +1,2 @@
 # HRMS
-Human Resource Management System using Java SpringBoot
+Human Resources Management System using Java SpringBoot
